@@ -1,0 +1,11 @@
+services:
+  glance:
+    image: glance:latest
+    container_name: glance
+    restart: always
+    ports:
+      - 8989:8080
+    # Add host.docker.internal mapping for container-to-host communication on Linux
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file: .env

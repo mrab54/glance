@@ -39,6 +39,12 @@ pages:
               - type: hacker-news
               - type: lobsters
 
+          - type: extension
+            title: GitHub Trending (Local)
+            url: http://host.docker.internal:8081/ # Use host.docker.internal for container -> host communication
+            allow-potentially-dangerous-html: true # Required for local HTML extensions
+            cache: 5m # Refresh every 5 minutes
+
           - type: videos
             channels:
               - UCXuqSBlHAE6Xw-yeJA0Tunw # Linus Tech Tips
