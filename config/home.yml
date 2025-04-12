@@ -1,0 +1,122 @@
+- name: Home
+  # Optionally, if you only have a single page you can hide the desktop navigation for a cleaner look
+  # hide-desktop-navigation: true
+  columns:
+    - size: small
+      widgets:
+        - type: calendar
+          first-day-of-week: monday
+
+        - type: rss
+          limit: 10
+          collapse-after: 3
+          cache: 12h
+          feeds:
+            - url: https://selfh.st/rss/
+              title: selfh.st
+            - url: https://ciechanow.ski/atom.xml
+            - url: https://www.joshwcomeau.com/rss.xml
+              title: Josh Comeau
+            - url: https://samwho.dev/rss.xml
+            - url: https://ishadeed.com/feed.xml
+              title: Ahmad Shadeed
+            - url: https://feeds.bloomberg.com/markets/news.rss
+              title: Bloomberg
+
+        - type: twitch-channels
+          channels:
+            - theprimeagen
+            - j_blow
+            - piratesoftware
+            - cohhcarnage
+            - christitustech
+            - EJ_SA
+
+    - size: full
+      widgets:
+        - type: group
+          widgets:
+            - type: hacker-news
+            - type: lobsters
+            - type: extension
+              title: GitHub Trending
+              # Use the service name 'github-trending' for container-to-container communication
+              url: http://github-trending:8081/
+              allow-potentially-dangerous-html: true # Required for local HTML extensions
+              cache: 5m # Refresh every 5 minutes
+
+        - type: videos
+          channels:
+            - UCR-DXc1voovS8nhAvccRZhg # Jeff Geerling
+            - UCsBjURrPoezykLs9EqgamOA # Fireship
+            - UCBJycsmduvYEL83R_U4JriQ # Marques Brownlee
+            - UCHnyfMqiRRG1u-2MsSQLbXA # Veritasium
+
+        - type: group
+          _reddit_widget_defaults: &redditDefaults
+            type: reddit
+            show-thumbnails: true
+            reddit-app-name: mr-glance
+            reddit-client-id: 8K3gXvOV4IIwOHJEwiEhNg
+            reddit-client-secret: DhaiQE1-jNRfn8xSY0JYyYOv7QaG0w
+            collapse-after: 10 
+
+          widgets:
+            - <<: *redditDefaults
+              subreddit: technology
+            - <<: *redditDefaults
+              subreddit: selfhosted
+            - <<: *redditDefaults
+              subreddit: homelab
+            - <<: *redditDefaults
+              subreddit: linux
+            - <<: *redditDefaults
+              subreddit: sysadmin
+            - <<: *redditDefaults
+              subreddit: datahoarding
+            - <<: *redditDefaults
+              subreddit: devops
+            - <<: *redditDefaults
+              subreddit: freesoftware
+            - <<: *redditDefaults
+              subreddit: opensource
+
+    - size: small
+      widgets:
+        - type: weather
+          location: 54115
+          units: imperial # alternatively "metric"
+          hour-format: 12h # alternatively "24h"
+          # Optionally hide the location from being displayed in the widget
+          # hide-location: true
+
+        - type: markets
+          markets:
+            - symbol: SPY
+              name: S&P 500
+            - symbol: QQQ
+              name: QQQ
+            - symbol: BTC-USD
+              name: Bitcoin
+            - symbol: NVDA
+              name: NVIDIA
+            - symbol: BROS
+              name: Dunn Bros
+            - symbol: MSFT
+              name: Microsoft
+
+        - type: server-stats
+          servers:
+            - type: local
+              name: Services
+
+        - type: releases
+          cache: 1d
+          # Without authentication the Github API allows for up to 60 requests per hour. You can create a
+          # read-only token from your Github account settings and use it here to increase the limit.
+          # token: ...
+          repositories:
+            - glanceapp/glance
+            - go-gitea/gitea
+            - immich-app/immich
+            - syncthing/syncthing

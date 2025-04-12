@@ -1,7 +1,11 @@
 services:
   glance:
-    image: glance:latest
-    container_name: glance
+    build: . # Build the image from the Dockerfile in the current directory
+    container_name: glance_app
+    image: ghcr.io/mrab54/glance:latest
+    volumes:
+      - ./config:/app/config
+      - ./assets:/app/assets
     restart: always
     ports:
       - 8989:8080
@@ -9,3 +13,21 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     env_file: .env
+    networks:
+      - glance-net
+
+  github-trending:
+    build:
+      context: ./extensions/github-trending # Path to the Dockerfile directory
+    container_name: github_trending_ext
+    # Expose port 8081 within the Docker network.
+    # You might not need to map it to the host unless you want direct access.
+    ports:
+      - "8081:8081" # Optional: Map host port 8081 to container port 8081
+    restart: unless-stopped
+    networks:
+      - glance-net
+
+networks:
+  glance-net:
+    driver: bridge

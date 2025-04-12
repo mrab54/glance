@@ -11,13 +11,18 @@ import (
 
 func main() {
 	http.HandleFunc("/", handler)
-	fmt.Println("GitHub Trending Extension server starting on :8081")
-	log.Fatal(http.ListenAndServe(":8081", nil))
+	fmt.Println("GitHub Trending Extension server starting on 0.0.0.0:8081")
+	// Listen on all interfaces within the container
+	log.Fatal(http.ListenAndServe("0.0.0.0:8081", nil))
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	// Set the required header for Glance
 	w.Header().Set("Widget-Content-Type", "html")
+	// Add headers to prevent browser caching
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate") // HTTP 1.1.
+	w.Header().Set("Pragma", "no-cache")                                   // HTTP 1.0.
+	w.Header().Set("Expires", "0")                                         // Proxies.
 
 	// Fetch the trending page
 	res, err := http.Get("https://github.com/trending")
@@ -44,7 +49,36 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	// Start building the HTML output
 	var htmlBuilder strings.Builder
-	htmlBuilder.WriteString(`<ul class="list list-gap-15">`)
+
+	// Add CSS for styling list items
+	htmlBuilder.WriteString(`
+<style>
+  .gh-trending-list .list-item {
+    border-bottom: 2px solid var(--color-border); /* Solid bottom border */
+    padding: 10px; /* Add padding inside the box */
+    margin-bottom: 10px; /* Adjust margin for spacing between items */
+    background-color: rgba(255, 255, 255, 0.05); /* Subtle background color */
+  }
+  .gh-trending-list .list-item:last-child {
+    margin-bottom: 0; /* Remove margin from the last item */
+    border-bottom: none; /* Remove border from the last item */
+    padding: 10px; /* Add padding to the last item */
+  }
+  .gh-trending-list .repo-language-color {
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	margin-right: 4px;
+	vertical-align: middle;
+	/* Default color, ideally replaced by actual language color */
+	background-color: var(--color-text-secondary);
+  }
+</style>
+`)
+
+	// Add a class to the main list for scoping the styles
+	htmlBuilder.WriteString(`<ul class="list gh-trending-list">`) // Removed list-gap-15 as margin-bottom handles spacing
 
 	// Find the repository items
 	doc.Find("article.Box-row").Each(func(i int, s *goquery.Selection) {
@@ -72,7 +106,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 		htmlBuilder.WriteString(`<ul class="list-horizontal-text size-h6 margin-top-10">`)
 		if language != "" {
-			htmlBuilder.WriteString(fmt.Sprintf(`<li><span class="repo-language-color" style="background-color: var(--color-primary);"></span> %s</li>`, language)) // Note: Color needs dynamic lookup or default
+			htmlBuilder.WriteString(fmt.Sprintf(`<li><span class="repo-language-color"></span> %s</li>`, language))
 		}
 		if totalStars != "" {
 			htmlBuilder.WriteString(fmt.Sprintf(`<li>⭐ %s</li>`, totalStars))
